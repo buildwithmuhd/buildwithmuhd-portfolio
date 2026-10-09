@@ -46,9 +46,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     .filter((post) => post.status !== "draft")
     .map((post) => ({
       url: `${SITE_URL}/blog/${post.slug}`,
-      lastModified: post.published_at
-        ? new Date(post.published_at)
-        : new Date(post.date),
+
       changeFrequency: "monthly" as const,
       priority: 0.85,
     }));

@@ -36,9 +36,7 @@ export function BlogListClient() {
             <article className="group border border-black/15 bg-white/70 p-6 shadow-[5px_5px_0_rgba(0,0,0,0.12)] transition-all duration-300 hover:shadow-[7px_7px_0_rgba(40,100,223,0.22)] hover:border-black/25">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <p className="font-mono text-[11px] font-bold uppercase tracking-[0.16em]">
-                    {post.date}
-                  </p>
+
                   <span className="size-1 rounded-full bg-black/30" />
                   <span className="inline-flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-black/55">
                     <Clock size={11} />

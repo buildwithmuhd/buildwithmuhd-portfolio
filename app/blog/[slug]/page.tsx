@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: postUrl,
       siteName: SITE_NAME,
       type: "article",
-      publishedTime: post.published_at ?? post.date,
+
       tags: post.tags,
       images: [
         {
@@ -93,8 +93,7 @@ export default async function BlogPostPage({ params }: PageProps) {
     "@type": "BlogPosting",
     headline: post.title,
     description,
-    datePublished: post.published_at ?? post.date,
-    dateModified: post.published_at ?? post.date,
+
     author: {
       "@type": "Person",
       name: SITE_AUTHOR,
@@ -180,7 +179,6 @@ export default async function BlogPostPage({ params }: PageProps) {
               </h1>
 
               <div className="mt-5 flex flex-wrap items-center gap-4 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-black/55">
-                <time>{post.date}</time>
                 <span className="size-1 rounded-full bg-black/30" />
                 <span className="inline-flex items-center gap-1.5">
                   <Clock size={12} />

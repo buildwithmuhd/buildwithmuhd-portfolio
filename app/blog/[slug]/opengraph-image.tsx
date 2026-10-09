@@ -186,18 +186,7 @@ export default async function OGImage({
               </div>
             ))}
           </div>
-          <div
-            style={{
-              fontSize: 16,
-              fontFamily: "monospace",
-              fontWeight: 700,
-              color: `${ink}88`,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase" as const,
-            }}
-          >
-            {post.date}
-          </div>
+
         </div>
       </div>
     ),

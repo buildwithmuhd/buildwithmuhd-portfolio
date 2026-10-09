@@ -2,7 +2,7 @@ export type BlogPost = {
   slug: string;
   title: string;
   excerpt: string;
-  date: string;
+
   tags: string[];
   content: string;
   readTime: number; // minutes
@@ -295,7 +295,6 @@ export const posts: BlogPost[] = [
     title: "Building In Public Without Leaking Secrets",
     excerpt:
       "A lightweight checklist for sharing progress online while keeping credentials, infrastructure details, and user data private.",
-    date: "Oct 9, 2026",
     tags: ["Operational Security", "Indie Hacking", "Writing"],
     content: buildingInPublicContent,
     readTime: calculateReadTime(buildingInPublicContent),
