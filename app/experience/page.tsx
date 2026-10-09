@@ -1,17 +1,76 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ArrowUpRight, Building2, MapPin } from "lucide-react";
 import { experiences } from "../../data/experience";
 import { accentClass, Sticker } from "../../components/scrapbook";
+import {
+  SITE_URL,
+  SITE_NAME,
+  SITE_AUTHOR,
+  TWITTER_HANDLE,
+} from "../../lib/constants";
 
 export const metadata: Metadata = {
-  title: "Experience",
+  title: "Work Experience & Engineering Roles",
   description:
-    "Work and internship experience for Muhammad Is'haq, including Very Unreal LLC, ngtaskhub.com, referx.com.ng, and Galaxy Backbone Abuja.",
+    "Professional experience of Muhammad Is'haq: Technology Director at Very Unreal, frontend engineering at ngtaskhub, and network operations at Galaxy Backbone.",
+  alternates: {
+    canonical: `${SITE_URL}/experience`,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    title: `Work Experience & Engineering Roles | ${SITE_AUTHOR}`,
+    description:
+      "Professional experience of Muhammad Is'haq: Technology Director at Very Unreal, frontend engineering at ngtaskhub, and network operations at Galaxy Backbone.",
+    url: `${SITE_URL}/experience`,
+    siteName: SITE_NAME,
+    type: "profile",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `Work Experience & Engineering Roles | ${SITE_AUTHOR}`,
+    description:
+      "Professional experience of Muhammad Is'haq: Technology Director at Very Unreal, frontend engineering at ngtaskhub, and network operations at Galaxy Backbone.",
+    creator: TWITTER_HANDLE,
+  },
 };
+
+function ExperienceJsonLd() {
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: SITE_URL,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Experience",
+        item: `${SITE_URL}/experience`,
+      },
+    ],
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+    />
+  );
+}
 
 export default function ExperiencePage() {
   return (
-    <main className="text-[#11100e]">
+    <>
+      <ExperienceJsonLd />
+      <main className="text-[#11100e]">
       <section className="px-6 py-16 sm:px-12 lg:px-20">
         <div className="mx-auto max-w-7xl">
           <p className="font-hand text-lg">where i&apos;ve worked</p>
@@ -78,11 +137,12 @@ export default function ExperiencePage() {
             </div>
           </div>
 
-          <a href="/contact" className="focus-ring mx-auto mt-12 inline-flex items-center gap-2 border-b-2 border-black pb-1 font-mono text-[11px] font-bold uppercase tracking-[0.16em]">
+          <Link href="/contact" className="focus-ring mx-auto mt-12 inline-flex items-center gap-2 border-b-2 border-black pb-1 font-mono text-[11px] font-bold uppercase tracking-[0.16em]">
             Build something together <ArrowUpRight size={14} />
-          </a>
+          </Link>
         </div>
       </section>
-    </main>
+      </main>
+    </>
   );
 }

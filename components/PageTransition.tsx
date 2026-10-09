@@ -1,12 +1,17 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { usePathname } from "next/navigation";
 
 export function PageTransition({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const reducedMotion = useReducedMotion();
+  const isFirstMount = useRef(true);
+
+  useEffect(() => {
+    isFirstMount.current = false;
+  }, [pathname]);
 
   return (
     <div className="relative min-h-[calc(100vh-56px)] overflow-x-hidden bg-[#eceae2] [perspective:2200px]">
@@ -14,7 +19,9 @@ export function PageTransition({ children }: { children: ReactNode }) {
         key={pathname}
         className="paper paper-edge relative min-h-[calc(100vh-56px)] origin-left [backface-visibility:hidden] [transform-style:preserve-3d]"
         initial={
-          reducedMotion
+          isFirstMount.current
+            ? false
+            : reducedMotion
             ? { opacity: 0 }
             : {
                 opacity: 0.1,
@@ -43,7 +50,7 @@ export function PageTransition({ children }: { children: ReactNode }) {
         }
       >
         {/* Tactile page crease shadow that fades out as the paper turns open */}
-        {!reducedMotion && (
+        {!reducedMotion && !isFirstMount.current && (
           <motion.div
             key={`spine-shadow-${pathname}`}
             className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-r from-black/25 via-black/5 to-transparent"

@@ -5,10 +5,42 @@ import { projects, profile } from "../index";
 import { portraits } from "../components/placeholders";
 import { Polaroid, Sticker } from "../components/scrapbook";
 
+import {
+  SITE_URL,
+  SITE_NAME,
+  SITE_AUTHOR,
+  TWITTER_HANDLE,
+  SAME_AS,
+} from "../lib/constants";
+
 export const metadata: Metadata = {
-  title: "Home",
+  title: {
+    absolute: "Muhammad Is'haq | AppSec & Frontend Engineer Portfolio",
+  },
   description:
-    "Muhammad Is'haq is an AppSec and frontend engineer building secure, high-performance products with Next.js, TypeScript, and Tailwind CSS.",
+    "AppSec and frontend engineer in Nigeria building secure, high-performance web products with Next.js, TypeScript, and robust application security principles.",
+  alternates: {
+    canonical: SITE_URL,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    title: "Muhammad Is'haq | AppSec & Frontend Engineer Portfolio",
+    description:
+      "AppSec and frontend engineer in Nigeria building secure, high-performance web products with Next.js, TypeScript, and robust application security principles.",
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Muhammad Is'haq | AppSec & Frontend Engineer Portfolio",
+    description:
+      "AppSec and frontend engineer in Nigeria building secure, high-performance web products with Next.js, TypeScript, and robust application security principles.",
+    creator: TWITTER_HANDLE,
+  },
 };
 
 function JsonLd() {
@@ -17,21 +49,35 @@ function JsonLd() {
     "@type": "Person",
     name: profile.name,
     alternateName: profile.handle,
-    url: profile.website,
+    url: SITE_URL,
     jobTitle: profile.role,
     address: {
       "@type": "PostalAddress",
       addressCountry: "NG",
     },
-    sameAs: [profile.github],
-    knowsAbout: profile.stack,
+    sameAs: SAME_AS,
+    knowsAbout: [
+      ...profile.stack,
+      "Threat Modeling",
+      "Vulnerability Assessment",
+      "Secure Software Development Life Cycle (SSDLC)",
+    ],
     worksFor: {
       "@type": "Organization",
       name: "Very Unreal LLC",
     },
+    alumniOf: {
+      "@type": "CollegeOrUniversity",
+      name: "University of Ilorin",
+    },
   };
 
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />;
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
 }
 
 export default function Home() {
@@ -105,9 +151,7 @@ export default function Home() {
               {featured.map((project, index) => (
                 <Link key={project.id} href="/projects" className="focus-ring interactive-lift group block">
                   <div className="relative bg-white p-3 shadow-paper">
-                    <span className="absolute left-4 top-4 z-10 bg-white px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.14em]">
-                      + {project.date}
-                    </span>
+
                     <img src={typeof project.image === "string" ? project.image : project.image.src} alt={`${project.name} project preview`} className="interactive-image aspect-[16/10] w-full object-cover transition duration-200 group-hover:grayscale" />
                   </div>
                   <h3 className="mt-4 text-center text-2xl font-black">{project.name}</h3>

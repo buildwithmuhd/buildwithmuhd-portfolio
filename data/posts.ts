@@ -6,7 +6,7 @@ export type BlogPost = {
   tags: string[];
   content: string;
   readTime: number; // minutes
-  image?: string; // path to cover image in /public (e.g. "/blog/cover.png")
+  image?: string;
   /** ISO 8601 date string for structured data (e.g. "2026-08-29") */
   published_at?: string;
   /** "published" | "draft" — defaults to "published" when omitted */
@@ -156,78 +156,116 @@ function calculateReadTime(content: string): number {
 const buildingInPublicContent = `
 ## The Tension
 
-Building in public is one of the best growth strategies for indie hackers and founders. Sharing your progress, your numbers, your code — it builds an audience, attracts collaborators, and keeps you accountable.
+Building in public is one of the best growth strategies for indie hackers and founders. Sharing your progress, your numbers, your code builds an audience, attracts collaborators, and keeps you accountable.
 
-But there's a tension. The same transparency that builds trust can also expose vulnerabilities. And I'm not talking about emotional vulnerability. I'm talking about leaked API keys, exposed infrastructure, and accidentally doxxing your users.
+But the same transparency that builds trust can also leak things you never meant to publish: API keys, user data, internal URLs. One careless screenshot is enough.
 
-## The Stakes Are Real
+## The One Rule That Matters Most
 
-Here's what can go wrong:
+**A secret that has been public, even for ten seconds, is a burned secret.**
 
-- **Screenshots with environment variables visible** in your terminal or IDE
-- **GitHub commits with hardcoded secrets** that live forever in git history
-- **Architecture diagrams that reveal your security boundaries** to potential attackers
-- **Database screenshots with real user data** shared in a "look at our growth" post
-- **Server IP addresses or internal URLs** visible in network tabs or error messages
+Deleting the tweet doesn't fix it. Deleting the commit doesn't fix it. Bots scrape GitHub and social feeds in real time, and git history keeps everything. If a key, token or webhook URL was ever visible:
 
-Each of these has happened to real founders. Some of them have happened to me (caught before posting, thankfully).
+1. **Rotate it first.** Generate a new one and revoke the old one.
+2. Then clean up the post or the commit.
+3. Then check the provider's logs for activity you don't recognize.
 
-## The Lightweight Checklist
+Everything else in this post is about not needing to do that.
 
-Before sharing anything publicly, run through this:
+## Where Secrets Actually Leak
 
-### Screenshots & Screen Recordings
-- [ ] Check terminal output for env vars, tokens, or API keys
-- [ ] Blur or crop any visible URLs that aren't public
-- [ ] Ensure no user data (emails, names, IDs) is visible
-- [ ] Check browser tabs for anything you wouldn't want public
-- [ ] Verify your IDE isn't showing sensitive files (like \`.env\`)
+Most people blur the \`.env\` file and think they're safe. These are the ones that get through:
+
+- **DevTools Network tab.** Authorization headers, cookies and request payloads are all one click away. A "look, it works" screenshot of a request can contain a live session token.
+- **Terminal prompts and stack traces.** They expose usernames, absolute file paths and machine names.
+- **Console and dashboard URLs.** Database IDs, project IDs and endpoints sit in the address bar and the page header.
+- **Webhook URLs, error-tracking DSNs and storage bucket names.** These behave like credentials, but nobody thinks of them as secrets.
+- **Git history.** A secret committed once and "removed" in the next commit is still there.
+- **Screen recordings.** Autofill dropdowns, notification popups and a tab you forgot you had open.
+- **Image metadata.** Exported screenshots and photos can carry device and location data.
+
+## Don't Rely on Remembering
+
+A manual checklist fails exactly when you're tired and excited to post. Put machines in the way:
+
+- **Pre-commit secret scanning** with gitleaks or trufflehog, so a commit containing a key never gets created.
+- **GitHub secret scanning and push protection** turned on for every repo.
+- **A \`.gitignore\` that covers \`.env*\` from the first commit**, plus a committed \`.env.example\` with fake values.
+- **A separate browser profile for screenshots**, with no extensions, no saved logins and no personal tabs.
+
+## A Real Near-Miss
+
+A few days ago I was learning Burp Suite, intercepting and modifying requests against my own servers, both local and live. I got a request tampered the way I wanted and took a screenshot of the intercept view to share.
+
+I almost posted it.
+
+The intercept panel shows the full raw request: session cookies, auth headers, everything. I was so focused on what I'd changed in the request body that I didn't see the credentials sitting in the same frame.
+
+I caught it because I shared it to a friend on discord jokingly telling him that i'm now a hacker, then he noticed the auth cookies and told me to remove them before i post it and also cautioned me to be careful next time.
+
+Afterwards, I tested with a throwaway account, so a leaked cookie would be worthless anyway.
+
+I didn't bother posting it again for some reason but i guess that was a reminder for me to always be careful when building in public.
+
+
+## The Checklist
+
+### Screenshots & Recordings
+- [ ] Network tab, headers and cookies are not visible
+- [ ] Terminal shows no env vars, tokens, usernames or local paths
+- [ ] No user data (emails, names, IDs) is visible
+- [ ] Address bar and page headers don't show project IDs, endpoints or internal URLs
+- [ ] Other tabs, notifications and autofill are hidden
 
 ### Code Snippets
-- [ ] Replace real values with placeholder data
-- [ ] Remove any comments that reference internal systems
-- [ ] Check imports for internal package names that reveal architecture
-- [ ] Ensure no hardcoded credentials exist in the snippet
+- [ ] Real values are replaced with placeholders
+- [ ] No comments reference internal systems or people
+- [ ] No hardcoded credentials, even "temporary" ones
 
 ### Metrics & Data
-- [ ] Anonymize user-related metrics
-- [ ] Aggregate numbers rather than showing individual records
-- [ ] Be careful with timestamps that could reveal user activity patterns
-- [ ] Don't share exact infrastructure costs (they reveal your scale and tools)
+- [ ] User-related numbers are aggregated, never individual records
+- [ ] Timestamps can't be used to profile one user's activity
+- [ ] You've decided on purpose whether to share revenue and costs. That's a business choice, not a security one.
 
-### Architecture & Technical Details
-- [ ] Share concepts, not implementation details
-- [ ] Use generic names for internal services
-- [ ] Don't share your exact security stack (it helps attackers target known vulnerabilities)
-- [ ] Keep deployment details vague ("cloud hosting" not "us-east-1 on t3.micro")
+## Assume Your Stack Is Known
+
+You'll often hear "don't reveal your tech stack, it helps attackers." That's weak advice. Attackers can fingerprint most stacks from response headers, error pages and front-end bundles in minutes. If hiding the vendor names is what protects you, you were never protected.
+
+Assume the attacker already knows your framework, your database and your host. Then ask what stops them:
+
+- Are secrets stored outside the code and rotated?
+- Is every endpoint authenticated and authorized?
+- Is user data encrypted and access-limited?
+- Are webhooks signature-verified?
+
+Share the stack freely. Protect the keys, the data and the access paths. Sharing *how* you secured something is good content. Sharing *the credentials* never is.
 
 ## The "Would I Tweet This?" Test
 
-Before posting anything technical, ask: "If my worst-case attacker saw this, would it help them?"
+Before posting anything technical, ask: "If someone patient and skilled saw this, what could they do with it?"
 
-Not your average script kiddie. Your worst-case attacker. Someone patient, skilled, and specifically targeting your product.
+An example:
 
-If the answer is "yes" or "maybe," redact. You can always share the concept without sharing the specifics.
+- **Before:** a screenshot of your Redis dashboard to show you hit the free-tier limit, with the endpoint hostname and database ID visible in the header and URL bar.
+- **After:** a crop of just the usage graph, or a recreated chart with no dashboard chrome.
 
-## What You *Should* Share
+The story ("I burned through 500K commands in days and had to find out why") is the valuable part. The identifiers add nothing to it. If the story survives the redaction, redact.
 
-The good news is, most of the valuable build-in-public content is completely safe to share:
+## What You Should Share
 
-- **Product decisions and the reasoning behind them** — this is gold for your audience and harmless to your security
-- **Design iterations and user feedback** — inspirational and educational
-- **Growth numbers (aggregated)** — motivating for the community
-- **Mistakes and lessons learned** — the most engaging content is often about failure
-- **Your process and workflow** — people want to know how you work, not what your database password is
+Most of the best build-in-public content is completely safe:
+
+- **Product decisions and the reasoning behind them.**
+- **Design iterations and user feedback.**
+- **Aggregated growth numbers.**
+- **Mistakes and lessons learned.** These are the most engaging posts, and they often show your security thinking best.
+- **Your process and workflow.**
 
 ## The Bottom Line
 
-Building in public is powerful. But "public" doesn't mean "everything." It means "everything that's safe to share."
+"Public" doesn't mean "everything." It means "everything that's safe to share," and you'll only get that reliably by combining habits with tooling.
 
-Think of it like open-source code. You publish the source, but you never publish the \`.env\` file.
-
-Be generous with your knowledge. Be careful with your credentials. And when in doubt, crop it out.
-
-**The best build-in-public creators share their thinking, not their secrets.**
+Rotate fast, automate the checks, and assume your stack is already known. Share your thinking, not your secrets.
 `;
 
 // Build posts with calculated read times
@@ -257,12 +295,11 @@ export const posts: BlogPost[] = [
     title: "Building In Public Without Leaking Secrets",
     excerpt:
       "A lightweight checklist for sharing progress online while keeping credentials, infrastructure details, and user data private.",
-    date: "Aug 29, 2026",
+    date: "Oct 9, 2026",
     tags: ["Operational Security", "Indie Hacking", "Writing"],
     content: buildingInPublicContent,
     readTime: calculateReadTime(buildingInPublicContent),
-    image: "/blog/buildinginpublic.png",
-    published_at: "2026-08-29",
+    published_at: "2026-10-09",
     status: "published",
   },
 ];

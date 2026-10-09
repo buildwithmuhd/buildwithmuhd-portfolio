@@ -2,12 +2,68 @@ import type { Metadata } from "next";
 import { portraits } from "../../components/placeholders";
 import { Polaroid, Sticker } from "../../components/scrapbook";
 import { profile } from "../../index";
+import {
+  SITE_URL,
+  SITE_NAME,
+  SITE_AUTHOR,
+  TWITTER_HANDLE,
+} from "../../lib/constants";
 
 export const metadata: Metadata = {
-  title: "About",
+  title: "About Me — AppSec & Frontend Systems",
   description:
-    "About Muhammad Is'haq, a Nigeria-based AppSec and frontend engineer, CS student, and Technology Director at Very Unreal LLC.",
+    "Learn about Muhammad Is'haq, a Nigerian AppSec and frontend engineer specializing in secure React architectures, threat modeling, and resilient web apps.",
+  alternates: {
+    canonical: `${SITE_URL}/about`,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    title: `About Me — AppSec & Frontend Systems | ${SITE_AUTHOR}`,
+    description:
+      "Learn about Muhammad Is'haq, a Nigerian AppSec and frontend engineer specializing in secure React architectures, threat modeling, and resilient web apps.",
+    url: `${SITE_URL}/about`,
+    siteName: SITE_NAME,
+    type: "profile",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `About Me — AppSec & Frontend Systems | ${SITE_AUTHOR}`,
+    description:
+      "Learn about Muhammad Is'haq, a Nigerian AppSec and frontend engineer specializing in secure React architectures, threat modeling, and resilient web apps.",
+    creator: TWITTER_HANDLE,
+  },
 };
+
+function AboutJsonLd() {
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: SITE_URL,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "About",
+        item: `${SITE_URL}/about`,
+      },
+    ],
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+    />
+  );
+}
 
 const bio = [
   "I'm a frontend engineer, currently teaching myself how the things I build can be broken — and then how to stop that from happening.",
@@ -27,7 +83,9 @@ export default function AboutPage() {
   ];
 
   return (
-    <main className="text-[#11100e]">
+    <>
+      <AboutJsonLd />
+      <main className="text-[#11100e]">
       <section className="relative px-6 py-16 sm:px-12 lg:px-20">
         <div className="mx-auto max-w-6xl">
           <p className="mb-6 font-hand text-xl">about me!</p>
@@ -83,6 +141,7 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-    </main>
+      </main>
+    </>
   );
 }

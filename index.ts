@@ -5,7 +5,7 @@ export type Project = {
   id: string;
   name: string;
   status: string;
-  date: string;
+
   description: string;
   vision: string;
   tags: string[];
@@ -28,7 +28,6 @@ export const projects: Project[] = [
     id: "buymebread",
     name: "BuyMeBread",
     status: "In Development",
-    date: "Oct 8, 2026",
     description:
       "A Paystack-powered Nigerian creator support platform with a NestJS, Prisma, PostgreSQL, Redis, Bull queues, Resend, Cloudinary, and secure creator payout flows.",
     vision:
@@ -42,7 +41,7 @@ export const projects: Project[] = [
     id: "helious",
     name: "Helious",
     status: "Live",
-    date: "Sep 17, 2026",
+
     description:
       "An AI-powered Ethereum smart contract analyzer that turns contract risk, safety scoring, and plain-English security summaries into a fast product experience.",
     vision:
@@ -56,7 +55,6 @@ export const projects: Project[] = [
     id: "challengemenow",
     name: "ChallengeMeNow",
     status: "Live",
-    date: "Aug 24, 2026",
     description:
       "A timed skill-assessment platform with challenge questions, granular scoring, weak-area detection, and progress tracking for developers and teams.",
     vision:
@@ -70,7 +68,6 @@ export const projects: Project[] = [
     id: "tracevault",
     name: "TraceVault",
     status: "MVP",
-    date: "Jul 9, 2026",
     description:
       "An open-source lost-and-found platform for campuses and communities, hardened with Clerk, MongoDB, Cloudinary, Redis caching, rate limits, and optimized indexes.",
     vision:
@@ -84,7 +81,6 @@ export const projects: Project[] = [
     id: "blindspot",
     name: "BlindSpot",
     status: "In Development",
-    date: "Jun 12, 2026",
     description:
       "A Tauri desktop privacy app for streamers and screen-sharers, built to hide sensitive regions instantly with blackout or blur overlays.",
     vision:
@@ -98,7 +94,6 @@ export const projects: Project[] = [
     id: "terminal-graveyard",
     name: "Terminal Graveyard",
     status: "Live",
-    date: "September 10th, 2026",
     description:
       "Terminal Graveyard is a lightweight, cross-platform background desktop application built using Tauri, Rust, and React. It acts as a dedicated archive, or graveyard, for your command-line history, automatically capturing and storing past commands so you never lose track of complex one-liners or frequently used scripts.",
     vision:
@@ -112,7 +107,6 @@ export const projects: Project[] = [
     id: "nest-js-starter",
     name: "NestJS Starter",
     status: "Live",
-    date: "September 10th, 2026",
     description:
       "Opinionated NestJS backend template by Kindra Studio Pre-wired with Prisma, PostgreSQL, JWT Auth, Google OAuth, and Rate Limiting",
     vision:

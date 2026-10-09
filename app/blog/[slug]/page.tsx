@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const ogImageUrl = `${SITE_URL}/blog/${slug}/opengraph-image`;
 
   return {
-    title: `${post.title} | ${SITE_AUTHOR}`,
+    title: post.title,
     description,
     openGraph: {
       title: `${post.title} | ${SITE_AUTHOR}`,
@@ -80,121 +80,191 @@ export default async function BlogPostPage({ params }: PageProps) {
   const postIndex = posts.findIndex((p) => p.slug === slug);
   const post = posts[postIndex];
 
-  if (!post) notFound();
+  if (!post || post.status === "draft") notFound();
 
   const prevPost = postIndex > 0 ? posts[postIndex - 1] : null;
   const nextPost = postIndex < posts.length - 1 ? posts[postIndex + 1] : null;
 
+  const description = postDescription(post);
+  const ogImageUrl = `${SITE_URL}/blog/${slug}/opengraph-image`;
+
+  const blogPostSchema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description,
+    datePublished: post.published_at ?? post.date,
+    dateModified: post.published_at ?? post.date,
+    author: {
+      "@type": "Person",
+      name: SITE_AUTHOR,
+      url: SITE_URL,
+    },
+    publisher: {
+      "@type": "Person",
+      name: SITE_AUTHOR,
+      url: SITE_URL,
+    },
+    image: ogImageUrl,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${SITE_URL}/blog/${slug}`,
+    },
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: SITE_URL,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Blog",
+        item: `${SITE_URL}/blog`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: post.title,
+        item: `${SITE_URL}/blog/${slug}`,
+      },
+    ],
+  };
+
   return (
-    <main className="text-[#11100e]">
-      <ReadingProgress />
-      <article className="px-6 py-16 sm:px-12 lg:px-20">
-        <div className="mx-auto max-w-3xl">
-          {/* Back link */}
-          <Link
-            href="/blog"
-            className="focus-ring mb-10 inline-flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-black/60 transition-colors hover:text-black"
-          >
-            <ChevronLeft size={14} />
-            All posts
-          </Link>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <main className="text-[#11100e]">
+        <ReadingProgress />
+        <article className="px-6 py-16 sm:px-12 lg:px-20">
+          <div className="mx-auto max-w-3xl">
+            {/* Back link */}
+            <Link
+              href="/blog"
+              className="focus-ring mb-10 inline-flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-black/60 transition-colors hover:text-black"
+            >
+              <ChevronLeft size={14} />
+              All posts
+            </Link>
 
-          {/* Header */}
-          <header>
-            <div className="flex flex-wrap items-center gap-3">
-              {post.tags.map((tag, index) => (
-                <Sticker
-                  key={tag}
-                  tone={
-                    (["yellow", "mint", "pink", "blue"] as const)[index % 4]
-                  }
-                >
-                  {tag}
-                </Sticker>
-              ))}
-            </div>
+            {/* Header */}
+            <header>
+              <div className="flex flex-wrap items-center gap-3">
+                {post.tags.map((tag, index) => (
+                  <Sticker
+                    key={tag}
+                    tone={
+                      (["yellow", "mint", "pink", "blue"] as const)[index % 4]
+                    }
+                  >
+                    {tag}
+                  </Sticker>
+                ))}
+              </div>
 
-            <h1 className="mt-6 font-display text-4xl leading-[1.05] sm:text-5xl lg:text-6xl">
-              {post.title.toUpperCase()}
-            </h1>
+              <h1 className="mt-6 font-display text-4xl leading-[1.05] sm:text-5xl lg:text-6xl">
+                {post.title.toUpperCase()}
+              </h1>
 
-            <div className="mt-5 flex flex-wrap items-center gap-4 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-black/55">
-              <time>{post.date}</time>
-              <span className="size-1 rounded-full bg-black/30" />
-              <span className="inline-flex items-center gap-1.5">
-                <Clock size={12} />
-                {post.readTime} min read
-              </span>
-            </div>
+              <div className="mt-5 flex flex-wrap items-center gap-4 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-black/55">
+                <time>{post.date}</time>
+                <span className="size-1 rounded-full bg-black/30" />
+                <span className="inline-flex items-center gap-1.5">
+                  <Clock size={12} />
+                  {post.readTime} min read
+                </span>
+              </div>
 
-            <p className="mt-6 text-lg leading-relaxed text-black/70">
-              {post.excerpt}
-            </p>
-
-
-
-            <div className="mt-8 h-px bg-black/10" />
-          </header>
-
-          {/* Client-rendered content with animations */}
-          <BlogPostClient content={post.content} />
-
-          {/* Social Media Previews Section (WhatsApp, Twitter, LinkedIn, Discord, Facebook, Instagram) */}
-          <SocialPreviews post={post} />
-
-          {/* Footer */}
-          <footer className="mt-16 border-t border-black/10 pt-10">
-            <p className="font-hand text-lg text-black/60">
-              Thanks for reading. — Muhammad Is&apos;haq
-            </p>
-
-            {/* Navigation between posts */}
-            <div className="mt-10 grid gap-4 sm:grid-cols-2">
-              {prevPost && (
-                <Link
-                  href={`/blog/${prevPost.slug}`}
-                  className="focus-ring interactive-lift group block border border-black/10 bg-white/70 p-5 shadow-[4px_4px_0_rgba(0,0,0,0.08)]"
-                >
-                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-black/45">
-                    ← Previous
-                  </span>
-                  <p className="mt-2 text-lg font-black tracking-[-0.02em] group-hover:text-[#2864df]">
-                    {prevPost.title}
-                  </p>
-                </Link>
-              )}
-              {nextPost && (
-                <Link
-                  href={`/blog/${nextPost.slug}`}
-                  className={`focus-ring interactive-lift group block border border-black/10 bg-white/70 p-5 shadow-[4px_4px_0_rgba(0,0,0,0.08)] ${!prevPost ? "sm:col-start-2" : ""}`}
-                >
-                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-black/45">
-                    Next →
-                  </span>
-                  <p className="mt-2 text-lg font-black tracking-[-0.02em] group-hover:text-[#2864df]">
-                    {nextPost.title}
-                  </p>
-                </Link>
-              )}
-            </div>
-
-            {/* CTA */}
-            <div className="mt-12 border border-black/15 bg-[#f6c843]/15 p-6 text-center shadow-[5px_5px_0_rgba(0,0,0,0.08)]">
-              <p className="text-lg font-black">Got thoughts on this?</p>
-              <p className="mt-2 text-sm text-black/65">
-                I&apos;d love to hear your perspective. Drop me a line.
+              <p className="mt-6 text-lg leading-relaxed text-black/70">
+                {post.excerpt}
               </p>
-              <Link
-                href="/contact"
-                className="focus-ring interactive-lift mt-5 inline-flex items-center gap-3 bg-black px-5 py-3 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-white shadow-[4px_4px_0_#2864df]"
-              >
-                <ArrowUpRight size={14} />
-                Get in touch
-              </Link>
-            </div>
-          </footer>
-        </div>
-      </article>
-    </main>
+
+              {post.image && (
+                <div className="tape relative mt-8 overflow-hidden bg-white p-3 shadow-paper">
+                  <img
+                    src={post.image}
+                    alt={`${post.title} article cover preview`}
+                    className="aspect-[16/9] w-full object-cover"
+                  />
+                </div>
+              )}
+
+              <div className="mt-8 h-px bg-black/10" />
+            </header>
+
+            {/* Client-rendered content with animations */}
+            <BlogPostClient content={post.content} />
+
+            {/* Social Media Previews Section (WhatsApp, Twitter, LinkedIn, Discord, Facebook, Instagram) */}
+            <SocialPreviews post={post} />
+
+            {/* Footer */}
+            <footer className="mt-16 border-t border-black/10 pt-10">
+              <p className="font-hand text-lg text-black/60">
+                Thanks for reading. — Muhammad Is&apos;haq
+              </p>
+
+              {/* Navigation between posts */}
+              <div className="mt-10 grid gap-4 sm:grid-cols-2">
+                {prevPost && (
+                  <Link
+                    href={`/blog/${prevPost.slug}`}
+                    className="focus-ring interactive-lift group block border border-black/10 bg-white/70 p-5 shadow-[4px_4px_0_rgba(0,0,0,0.08)]"
+                  >
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-black/45">
+                      ← Previous
+                    </span>
+                    <p className="mt-2 text-lg font-black tracking-[-0.02em] group-hover:text-[#2864df]">
+                      {prevPost.title}
+                    </p>
+                  </Link>
+                )}
+                {nextPost && (
+                  <Link
+                    href={`/blog/${nextPost.slug}`}
+                    className={`focus-ring interactive-lift group block border border-black/10 bg-white/70 p-5 shadow-[4px_4px_0_rgba(0,0,0,0.08)] ${!prevPost ? "sm:col-start-2" : ""}`}
+                  >
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-black/45">
+                      Next →
+                    </span>
+                    <p className="mt-2 text-lg font-black tracking-[-0.02em] group-hover:text-[#2864df]">
+                      {nextPost.title}
+                    </p>
+                  </Link>
+                )}
+              </div>
+
+              {/* CTA */}
+              <div className="mt-12 border border-black/15 bg-[#f6c843]/15 p-6 text-center shadow-[5px_5px_0_rgba(0,0,0,0.08)]">
+                <p className="text-lg font-black">Got thoughts on this?</p>
+                <p className="mt-2 text-sm text-black/65">
+                  I&apos;d love to hear your perspective. Drop me a line.
+                </p>
+                <Link
+                  href="/contact"
+                  className="focus-ring interactive-lift mt-5 inline-flex items-center gap-3 bg-black px-5 py-3 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-white shadow-[4px_4px_0_#2864df]"
+                >
+                  <ArrowUpRight size={14} />
+                  Get in touch
+                </Link>
+              </div>
+            </footer>
+          </div>
+        </article>
+      </main>
+    </>
   );
 }

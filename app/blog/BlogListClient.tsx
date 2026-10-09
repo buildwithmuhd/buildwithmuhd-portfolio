@@ -66,7 +66,7 @@ export function BlogListClient() {
                   </h2>
                   <p className="mt-3 text-black/70">{post.excerpt}</p>
                 </div>
-                {post.image && (
+                {/* {post.image && (
                   <div className="relative mt-4 overflow-hidden border border-black/10 bg-white p-1.5 shadow-sm md:mt-0">
                     <img
                       src={post.image}
@@ -74,7 +74,7 @@ export function BlogListClient() {
                       className="aspect-[16/10] w-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                   </div>
-                )}
+                )} */}
               </div>
               <Link
                 className="focus-ring mt-6 inline-flex items-center gap-2 border-b-2 border-black pb-1 font-mono text-[11px] font-bold uppercase tracking-[0.16em] transition-all duration-200 hover:border-[#2864df] hover:text-[#2864df]"
